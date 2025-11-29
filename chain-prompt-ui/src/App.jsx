@@ -12,8 +12,6 @@ import {
   getBezierPath,
   EdgeLabelRenderer,
   useReactFlow,
-  useStoreApi,
-  // 🚨 FIX: Import the provider
   ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -544,7 +542,7 @@ const edgeTypes = {
   deleteButton: DeleteButtonEdge,
 };
 
-// --- Main Component Logic (Needs to be a standalone component) ---
+// --- Main Component Logic ---
 function WorkflowOrchestrationContent() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -556,7 +554,9 @@ function WorkflowOrchestrationContent() {
   const [executingParentIds, setExecutingParentIds] = useState([]);
   const [isExecuting, setIsExecuting] = useState(false);
   const chatEndRef = useRef(null);
-  const store = useStoreApi();
+
+  // 🚨 Removed hasSelection state and its useEffect/handler hooks since the Delete Selected button is removed
+  // The ReactFlow component will now manage node/edge selection internally.
 
   const CHILD_NODE_HEIGHT = 170;
   const NODE_VERTICAL_SPACING = 50;
@@ -570,6 +570,22 @@ function WorkflowOrchestrationContent() {
   useEffect(() => {
     scrollToBottom();
   }, [activeParentNode, isThinking]);
+
+  // Custom OnNodesChange handler to ensure React Flow internal state updates
+  const handleNodesChange = useCallback(
+    (changes) => {
+      onNodesChange(changes);
+    },
+    [onNodesChange]
+  );
+
+  // Custom OnEdgesChange handler to ensure React Flow internal state updates
+  const handleEdgesChange = useCallback(
+    (changes) => {
+      onEdgesChange(changes);
+    },
+    [onEdgesChange]
+  );
 
   const onConnect = useCallback(
     (params) =>
@@ -799,7 +815,6 @@ function WorkflowOrchestrationContent() {
           : node
       )
     );
-    // Also update activeParentNode state for immediate UI refresh
     setActiveParentNode((prevNode) => {
       const updatedNode = nodes.find((n) => n.id === nodeId);
       if (!updatedNode) return null;
@@ -834,7 +849,6 @@ function WorkflowOrchestrationContent() {
     setInputValue("");
     setIsThinking(true);
 
-    // 1. Update chat history with user message
     updateParentNodeChatHistory(activeParentNode.id, [newMessage]);
 
     setTimeout(() => {
@@ -849,10 +863,8 @@ function WorkflowOrchestrationContent() {
         }),
       };
 
-      // 2. Update chat history with AI response
       updateParentNodeChatHistory(activeParentNode.id, [aiResponse]);
 
-      // 3. Re-generate children nodes
       createChildrenAndGrandchildren(activeParentNode.id, userPrompt);
     }, 2000);
   };
@@ -894,9 +906,6 @@ function WorkflowOrchestrationContent() {
     return { nodeIds: nodeIdsInBranch, edgeIds: edgesInBranch };
   };
 
-  /**
-   * FEATURE: Execute a specific Parent Node workflow
-   */
   const handleExecuteParentWorkflow = useCallback(
     (parentNodeId) => {
       if (executingParentIds.includes(parentNodeId)) return;
@@ -909,7 +918,6 @@ function WorkflowOrchestrationContent() {
         edges
       );
 
-      // 1. Set edges in the branch to animated
       setEdges((eds) =>
         eds.map((edge) => {
           if (edgeIds.includes(edge.id)) {
@@ -919,13 +927,11 @@ function WorkflowOrchestrationContent() {
         })
       );
 
-      // 2. Simulate execution time (3 seconds)
       setTimeout(() => {
         setExecutingParentIds((prev) =>
           prev.filter((id) => id !== parentNodeId)
         );
 
-        // 3. Set edges back to non-animated
         setEdges((eds) =>
           eds.map((edge) => {
             if (edgeIds.includes(edge.id)) {
@@ -935,7 +941,6 @@ function WorkflowOrchestrationContent() {
           })
         );
 
-        // 4. Update child node statuses (Simulated)
         setNodes((nds) =>
           nds.map((node) => {
             if (node.type === "child" && nodeIds.includes(node.id)) {
@@ -952,9 +957,6 @@ function WorkflowOrchestrationContent() {
     [edges, setEdges, setNodes, executingParentIds, nodes]
   );
 
-  /**
-   * FEATURE: Mass Run ALL Parent Prompt Workflows
-   */
   const handleMassRun = useCallback(() => {
     const parentIds = nodes.filter((n) => n.type === "parent").map((n) => n.id);
     parentIds.forEach((id) => handleExecuteParentWorkflow(id));
@@ -962,13 +964,10 @@ function WorkflowOrchestrationContent() {
     setTimeout(() => setIsExecuting(false), 3000);
   }, [nodes, handleExecuteParentWorkflow]);
 
-  /**
-   * FEATURE: Mass Delete ALL Parent Prompt Workflows (Clusters)
-   */
-  const handleMassDeleteCluster = useCallback(() => {
+  const handleMassDeleteClusterGlobal = useCallback(() => {
     if (
       !confirm(
-        "Are you sure you want to delete ALL workflow branches (all Parent Prompts and their descendants)? This action cannot be undone."
+        "Are you sure you want to delete ALL Parent Prompts and their descendants? This action cannot be undone."
       )
     ) {
       return;
@@ -980,7 +979,6 @@ function WorkflowOrchestrationContent() {
     let allEdgesToDelete = [];
 
     parentNodes.forEach((parentNode) => {
-      // Include the parent node itself in the deletion list
       allNodesToDelete.push(parentNode.id);
       const { nodeIds, edgeIds } = findBranchNodesAndEdges(
         parentNode.id,
@@ -994,13 +992,10 @@ function WorkflowOrchestrationContent() {
     const uniqueNodesToDelete = Array.from(new Set(allNodesToDelete));
     const uniqueEdgesToDelete = Array.from(new Set(allEdgesToDelete));
 
-    // Remove nodes
     setNodes((nds) => nds.filter((n) => !uniqueNodesToDelete.includes(n.id)));
 
-    // Remove edges, including connections between the deleted nodes
     setEdges((eds) => eds.filter((e) => !uniqueEdgesToDelete.includes(e.id)));
 
-    // Clear selection and side panels
     setSelectedNode(null);
     setShowParentChat(false);
   }, [nodes, edges, setNodes, setEdges]);
@@ -1008,43 +1003,6 @@ function WorkflowOrchestrationContent() {
   const handleExecuteWorkflowGlobal = () => {
     handleMassRun();
   };
-
-  /**
-   * FEATURE: Mass Delete Function (via Marquee/Selection)
-   */
-  const handleMassDelete = useCallback(() => {
-    const { get } = store.getState();
-    const selectedNodes = get.nodes.filter((n) => n.selected).map((n) => n.id);
-    const selectedEdges = get.edges.filter((e) => e.selected).map((e) => e.id);
-
-    if (selectedNodes.length === 0 && selectedEdges.length === 0) {
-      alert("No nodes or edges selected for deletion.");
-      return;
-    }
-
-    if (
-      confirm(
-        `Are you sure you want to delete ${selectedNodes.length} nodes and ${selectedEdges.length} connections?`
-      )
-    ) {
-      // Remove selected nodes
-      setNodes((nds) => nds.filter((n) => !selectedNodes.includes(n.id)));
-
-      // Remove selected edges and any edges connected to the deleted nodes
-      setEdges((eds) =>
-        eds.filter(
-          (e) =>
-            !selectedEdges.includes(e.id) &&
-            !selectedNodes.includes(e.source) &&
-            !selectedNodes.includes(e.target)
-        )
-      );
-
-      // Clear selection and side panels
-      setSelectedNode(null);
-      setShowParentChat(false);
-    }
-  }, [setNodes, setEdges, store]);
 
   const addNewNode = (type) => {
     const defaultData = {
@@ -1141,7 +1099,7 @@ function WorkflowOrchestrationContent() {
           <div className="flex items-center gap-3">
             {/* FEATURE: Delete All Workflows Button (Cluster Delete) */}
             <button
-              onClick={handleMassDeleteCluster}
+              onClick={handleMassDeleteClusterGlobal}
               className="px-4 py-2 bg-red-800/70 hover:bg-red-900 disabled:bg-gray-700/50 text-white rounded-lg transition-all duration-200 text-sm font-semibold shadow-lg shadow-red-500/30 flex items-center gap-2"
               title="Delete ALL Parent Prompts and their entire branches"
             >
@@ -1149,15 +1107,7 @@ function WorkflowOrchestrationContent() {
               Delete All Workflows
             </button>
 
-            {/* FEATURE: Delete Selected Button (Marquee Delete) */}
-            <button
-              onClick={handleMassDelete}
-              className="px-4 py-2 bg-red-600/70 hover:bg-red-700 disabled:bg-gray-700/50 text-white rounded-lg transition-all duration-200 text-sm font-semibold shadow-lg shadow-red-500/30 flex items-center gap-2"
-              title="Delete Selected Nodes/Edges (Use Shift + Drag to select)"
-            >
-              <Trash className="w-4 h-4" />
-              Delete Selected
-            </button>
+            {/* 🚨 REMOVED: Delete Selected Button (Now rely on keyboard delete for selection) */}
 
             <div className="px-6 py-4 flex items-center justify-between border-t border-gray-700/30">
               <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -1465,15 +1415,16 @@ function WorkflowOrchestrationContent() {
               },
             }))}
             edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
+            onNodesChange={handleNodesChange} // 🚨 Use custom handler
+            onEdgesChange={handleEdgesChange} // 🚨 Use custom handler
             onConnect={onConnect}
             onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            deleteKeyCode={["Backspace", "Delete"]}
+            deleteKeyCode={["Backspace", "Delete"]} // Allows keyboard delete for selected elements
             selectionKeyCode="Shift" // Use Shift for marquee selection
-            panOnDrag={false} // Disable default pan on drag to allow marquee selection
+            // 🚨 FIX: Re-enable panOnDrag for hand movement (panning)
+            panOnDrag={true}
             fitView
             className="bg-transparent"
           >
@@ -1701,7 +1652,7 @@ function WorkflowOrchestrationContent() {
   );
 }
 
-// 🚨 FIX: Export the component wrapped in ReactFlowProvider to ensure context availability
+// 🚨 WRAPPER: Export the component wrapped in ReactFlowProvider
 export default function WorkflowOrchestration() {
   return (
     <ReactFlowProvider>
