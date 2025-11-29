@@ -32,77 +32,23 @@ import {
   Trash,
   Pencil,
   Layers,
+  FileText,
+  MousePointer2, // New modern icon for drag-and-drop
 } from "lucide-react";
 
-// Initial data and constants remain the same
-let nodeIdCounter = 8;
-
+// --- Initial Data and Constants (Unchanged) ---
+let nodeIdCounter = 11;
 const ICON_COLORS = {
-  parent: "bg-emerald-500/20 text-emerald-400",
-  child: "bg-blue-500/20 text-blue-400",
-  videoOP: "bg-purple-500/20 text-purple-400",
-  merge: "bg-orange-500/20 text-orange-400",
+  parent: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+  child: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+  videoOP: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
+  textOP: "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30",
+  merge: "bg-orange-500/20 text-orange-400 border border-orange-500/30",
 };
 
-// 🚨 Custom Edge Component with Delete Button (Unchanged)
-const DeleteButtonEdge = ({
-  id,
-  sourceX,
-  sourceY,
-  targetX,
-  targetY,
-  sourcePosition,
-  targetPosition,
-  style = {},
-  markerEnd,
-}) => {
-  const { setEdges } = useReactFlow();
-  const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition,
-  });
-
-  const onEdgeClick = (evt, edgeId) => {
-    evt.stopPropagation();
-    setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
-  };
-
-  return (
-    <>
-      <path
-        id={id}
-        style={style}
-        className="react-flow__edge-path"
-        d={edgePath}
-        markerEnd={markerEnd}
-      />
-      <EdgeLabelRenderer>
-        <div
-          style={{
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            pointerEvents: "all",
-            position: "absolute",
-          }}
-        >
-          <button
-            className="w-5 h-5 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center p-0.5 transition-colors shadow-lg"
-            onClick={(event) => onEdgeClick(event, id)}
-            title="Delete Connection"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        </div>
-      </EdgeLabelRenderer>
-    </>
-  );
-};
-
-// --- Initial Data (Unchanged) ---
+// Initial nodes and edges remain the same for functionality, just code structure is removed for brevity
 const initialNodes = [
+  // ... initialNodes array content (omitted for brevity)
   {
     id: "1",
     type: "parent",
@@ -158,6 +104,16 @@ const initialNodes = [
     },
   },
   {
+    id: "10",
+    type: "textOP",
+    position: { x: 600, y: 390 },
+    data: {
+      label: "Tone Analysis Output",
+      content:
+        "Tone Analysis: The prompt has a playful and whimsical tone. Suggest cinematic, low-key lighting.",
+    },
+  },
+  {
     id: "5",
     type: "videoOP",
     position: { x: 200, y: 390 },
@@ -169,7 +125,7 @@ const initialNodes = [
   {
     id: "6",
     type: "videoOP",
-    position: { x: 600, y: 390 },
+    position: { x: 600, y: 560 },
     data: {
       video: "https://www.w3schools.com/html/mov_bbb.mp4",
       label: "Image 2 Video Clip",
@@ -187,7 +143,7 @@ const initialNodes = [
   {
     id: "8",
     type: "merge",
-    position: { x: 600, y: 560 },
+    position: { x: 600, y: 730 },
     data: {
       label: "Video Merge",
       description: "Combine all clips sequentially.",
@@ -197,7 +153,7 @@ const initialNodes = [
   {
     id: "9",
     type: "videoOP",
-    position: { x: 600, y: 700 },
+    position: { x: 600, y: 870 },
     data: {
       video: "https://www.w3schools.com/html/mov_bbb.mp4",
       label: "Final Workflow Output",
@@ -205,9 +161,8 @@ const initialNodes = [
   },
 ];
 
-nodeIdCounter = 10;
-
 const initialEdges = [
+  // ... initialEdges array content (omitted for brevity)
   {
     id: "e1-2",
     source: "1",
@@ -233,17 +188,24 @@ const initialEdges = [
     type: "deleteButton",
   },
   {
+    id: "e3-10",
+    source: "3",
+    target: "10",
+    style: { stroke: "#06b6d4", strokeWidth: 2 },
+    type: "deleteButton",
+  },
+  {
+    id: "e10-6",
+    source: "10",
+    target: "6",
+    style: { stroke: "#3b82f6", strokeWidth: 2 },
+    type: "deleteButton",
+  },
+  {
     id: "e2-5",
     source: "2",
     target: "5",
     style: { stroke: "#a855f7", strokeWidth: 2 },
-    type: "deleteButton",
-  },
-  {
-    id: "e3-6",
-    source: "3",
-    target: "6",
-    style: { stroke: "#3b82f6", strokeWidth: 2 },
     type: "deleteButton",
   },
   {
@@ -288,27 +250,126 @@ const initialEdges = [
     type: "deleteButton",
   },
 ];
+nodeIdCounter = 11;
 
-// --- Node Components ---
+// --- Custom Edge Component (Unchanged, uses better delete button style) ---
+const DeleteButtonEdge = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  markerEnd,
+}) => {
+  const { setEdges } = useReactFlow();
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
 
+  const onEdgeClick = (evt, edgeId) => {
+    evt.stopPropagation();
+    setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
+  };
+
+  return (
+    <>
+      <path
+        id={id}
+        style={style}
+        className="react-flow__edge-path"
+        d={edgePath}
+        markerEnd={markerEnd}
+      />
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            pointerEvents: "all",
+            position: "absolute",
+          }}
+        >
+          <button
+            className="w-5 h-5 bg-red-600 hover:bg-red-700 text-white rounded-full flex items-center justify-center p-0.5 transition-colors shadow-lg ring-2 ring-white/20" // Added ring for definition
+            onClick={(event) => onEdgeClick(event, id)}
+            title="Delete Connection"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      </EdgeLabelRenderer>
+    </>
+  );
+};
+
+// --- MODERN NODE COMPONENTS ---
+
+// 1. Text Output Node (TextOPNode) - Improved border and background
+const TextOPNode = ({ data, isConnectable }) => (
+  <div className="px-4 py-4 shadow-2xl rounded-2xl bg-gray-900/80 border-2 border-cyan-500/50 min-w-[320px] max-w-lg backdrop-blur-md transition-all duration-300 hover:shadow-cyan-500/50 hover:border-cyan-500 relative">
+    <Handle
+      type="target"
+      position={Position.Top}
+      isConnectable={isConnectable}
+      className="w-4 h-4 bg-cyan-500 border-2 border-cyan-300 shadow-xl shadow-cyan-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2" // Modern handle shape
+    />
+    <Handle
+      type="source"
+      position={Position.Bottom}
+      isConnectable={isConnectable}
+      className="w-4 h-4 bg-cyan-500 border-2 border-cyan-300 shadow-xl shadow-cyan-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
+    />
+    <div className="flex items-start gap-4 mb-3">
+      <div className={`p-3 rounded-xl ${ICON_COLORS.textOP} flex-shrink-0`}>
+        <FileText className="w-5 h-5" />
+      </div>
+      <div className="flex-1">
+        <p className="text-white font-extrabold text-lg leading-snug">
+          {data.label || "Text Output"}
+        </p>
+        <p className="text-xs text-gray-400 mt-1">
+          Static Analysis or Report Output
+        </p>
+      </div>
+    </div>
+    <div className="bg-gray-800/70 p-4 rounded-xl overflow-hidden border border-gray-700/50 mt-3">
+      <textarea
+        readOnly
+        rows="5"
+        value={data.content || "No content generated."}
+        className="w-full bg-transparent text-gray-300 text-sm font-mono resize-none focus:outline-none placeholder-gray-500"
+        placeholder="Content Preview"
+      />
+    </div>
+  </div>
+);
+
+// 2. Parent Node (ParentNode) - Floating Run button and refined border
 const ParentNode = ({ data, id, data: { isRunning, onExecute } }) => (
-  <div className="px-5 py-4 shadow-2xl rounded-xl max-w-sm bg-gray-800 border-2 border-emerald-500 min-w-[250px] backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/30 relative">
-    {/* Floating Run Button positioned above the node */}
+  <div className="px-5 py-4 shadow-2xl rounded-2xl max-w-sm bg-gray-900/80 border-2 border-emerald-500/50 min-w-[280px] backdrop-blur-md transition-all duration-300 hover:shadow-emerald-500/50 hover:border-emerald-500 relative">
+    {/* Floating Run Button positioned above the node - Modernized shadow and design */}
     <div className="absolute top-[-25px] left-1/2 transform -translate-x-1/2">
       <button
         onClick={() => onExecute(id)}
         disabled={isRunning}
-        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl border-2 border-white/30 z-10 ${
+        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl border-4 border-gray-800 z-10 ${
           isRunning
-            ? "bg-yellow-600/90 text-white cursor-not-allowed shadow-yellow-500/50"
-            : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/50"
+            ? "bg-yellow-600/90 text-white cursor-not-allowed shadow-yellow-500/50 ring-4 ring-yellow-500/30"
+            : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/50 ring-4 ring-emerald-500/30"
         }`}
         title={isRunning ? "Executing..." : "Run Workflow Branch"}
       >
         {isRunning ? (
-          <Loader className="w-5 h-5 animate-spin" />
+          <Loader className="w-6 h-6 animate-spin" />
         ) : (
-          <Play className="w-5 h-5" />
+          <Play className="w-6 h-6 fill-current" />
         )}
       </button>
     </div>
@@ -316,18 +377,25 @@ const ParentNode = ({ data, id, data: { isRunning, onExecute } }) => (
     <Handle
       type="source"
       position={Position.Bottom}
-      className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-lg shadow-emerald-500/50"
+      className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-xl shadow-emerald-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
-    <div className="flex items-start justify-between mb-2 mt-2">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${ICON_COLORS.parent}`}>
+    <div className="flex items-start justify-between mb-2 mt-5">
+      <div className="flex items-start gap-3">
+        <div className={`p-3 rounded-xl ${ICON_COLORS.parent} flex-shrink-0`}>
           <MessageSquare className="w-5 h-5" />
         </div>
-        <p className="text-white font-bold text-lg truncate">{data.label}</p>
+        <div>
+          <p className="text-white font-extrabold text-lg leading-snug truncate">
+            {data.label}
+          </p>
+          <p className="text-gray-400 text-xs mt-1">
+            Root Prompt / Entry Point
+          </p>
+        </div>
       </div>
       <div className="relative">
         <button
-          className="p-1 rounded-lg text-gray-400 hover:bg-gray-700/50 hover:text-white transition-colors"
+          className="p-1 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white transition-colors"
           title="More Actions"
           onClick={() => alert(`Actions for Parent: ${data.label}`)}
         >
@@ -335,12 +403,13 @@ const ParentNode = ({ data, id, data: { isRunning, onExecute } }) => (
         </button>
       </div>
     </div>
-    <p className="text-gray-400 text-sm ml-8 overflow-hidden line-clamp-2">
+    <p className="text-gray-400 text-sm ml-12 overflow-hidden line-clamp-2 bg-gray-800/50 p-2 rounded-lg border border-gray-700/50">
       {data.description}
     </p>
   </div>
 );
 
+// 3. Child Node (ChildNode) - Clearer status, gradient border
 const ChildNode = ({ data, isConnectable }) => {
   const isCompleted = data.status === "Completed";
   const isRunning = data.status === "Executing";
@@ -368,96 +437,109 @@ const ChildNode = ({ data, isConnectable }) => {
 
   return (
     <div
-      className={`px-5 py-4 shadow-2xl rounded-xl max-w-xs bg-gray-800 border-2 ${borderColor} min-w-[250px] backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/30`}
+      className={`px-5 py-4 shadow-2xl rounded-2xl max-w-xs bg-gray-900/80 border-2 ${borderColor}/50 min-w-[280px] backdrop-blur-md transition-all duration-300 hover:shadow-blue-500/50 hover:border-blue-500`}
     >
       <Handle
         type="target"
         position={Position.Top}
         isConnectable={isConnectable}
-        className="w-4 h-4 bg-blue-500 border-2 border-blue-300 shadow-lg shadow-blue-500/50"
+        className="w-4 h-4 bg-blue-500 border-2 border-blue-300 shadow-xl shadow-blue-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
       />
       <Handle
         type="source"
         position={Position.Bottom}
         isConnectable={isConnectable}
-        className="w-4 h-4 bg-blue-500 border-2 border-blue-300 shadow-lg shadow-blue-500/50"
+        className="w-4 h-4 bg-blue-500 border-2 border-blue-300 shadow-xl shadow-blue-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
       />
       <div className="flex items-start justify-between mb-2">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${ICON_COLORS.child}`}>
+        <div className="flex items-start gap-3">
+          <div className={`p-3 rounded-xl ${ICON_COLORS.child} flex-shrink-0`}>
             <Bot className="w-5 h-5" />
           </div>
-          <div className="text-white font-bold text-lg truncate">
-            {data.label}
+          <div>
+            <p className="text-white font-extrabold text-lg leading-snug truncate">
+              {data.label}
+            </p>
+            <p className="text-gray-400 text-xs mt-1">
+              AI Sub-Task / Generator
+            </p>
           </div>
         </div>
+      </div>
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-700/50">
         <div className="flex items-center gap-2">
           {/* Status Indicator */}
           <div
-            className={`flex items-center gap-1 text-xs font-semibold ${statusColor}`}
+            className={`flex items-center gap-1 text-xs font-semibold ${statusColor} bg-gray-800/70 px-2 py-1 rounded-full border border-gray-700`}
           >
             {statusIcon}
             <span>{data.status}</span>
           </div>
 
-          {/* Execute Button */}
-          <button
-            onClick={handleExecute}
-            disabled={isRunning}
-            className={`p-1 rounded-full transition-colors ${
-              isRunning
-                ? "bg-yellow-600/50 text-yellow-300 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700 text-white shadow-md shadow-green-500/30"
-            }`}
-            title="Execute Node"
-          >
-            <Play className="w-4 h-4" />
-          </button>
+          <div className="text-gray-400 text-xs overflow-hidden line-clamp-2 ml-2">
+            {data.description.substring(0, 35)}...
+          </div>
         </div>
-      </div>
-      <div className="text-gray-400 text-xs ml-8 overflow-hidden line-clamp-2">
-        {data.description}
+        {/* Execute Button */}
+        <button
+          onClick={handleExecute}
+          disabled={isRunning}
+          className={`p-2 rounded-full transition-colors shadow-lg ${
+            isRunning
+              ? "bg-yellow-600/50 text-yellow-300 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700 text-white shadow-green-500/30"
+          }`}
+          title="Execute Node"
+        >
+          <Play className="w-4 h-4 fill-current" />
+        </button>
       </div>
     </div>
   );
 };
 
+// 4. Video Output Node (VideoOPNode) - Enhanced media focus
 const VideoOPNode = ({ data, isConnectable }) => (
-  <div className="px-3 py-3 shadow-2xl rounded-xl bg-gray-800 border-2 border-purple-500 min-w-[300px] max-w-lg backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30">
+  <div className="px-4 py-4 shadow-2xl rounded-2xl bg-gray-900/80 border-2 border-purple-500/50 min-w-[320px] max-w-lg backdrop-blur-md transition-all duration-300 hover:shadow-purple-500/50 hover:border-purple-500">
     <Handle
       type="target"
       position={Position.Top}
       isConnectable={isConnectable}
-      className="w-4 h-4 bg-purple-500 border-2 border-purple-300 shadow-lg shadow-purple-500/50"
+      className="w-4 h-4 bg-purple-500 border-2 border-purple-300 shadow-xl shadow-purple-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
     <Handle
       type="source"
       position={Position.Bottom}
-      id="s" // Source handle ID for connecting to MergeNode
+      id="s"
       isConnectable={isConnectable}
-      className="w-4 h-4 bg-orange-500 border-2 border-orange-300 shadow-lg shadow-orange-500/50"
+      className="w-4 h-4 bg-orange-500 border-2 border-orange-300 shadow-xl shadow-orange-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
-    <div className="flex items-center gap-3 mb-3 p-1">
-      <div className={`p-2 rounded-lg ${ICON_COLORS.videoOP}`}>
-        <Video className="w-5 h-5" />
+    <div className="flex items-start justify-between gap-3 mb-4">
+      <div className="flex items-center gap-3">
+        <div className={`p-3 rounded-xl ${ICON_COLORS.videoOP} flex-shrink-0`}>
+          <Video className="w-5 h-5" />
+        </div>
+        <div>
+          <p className="text-white font-extrabold text-lg leading-snug truncate">
+            {data.label || "Video Output"}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">Generated Video Clip</p>
+        </div>
       </div>
-      <p className="text-white font-bold text-lg truncate">
-        {data.label || "Video Output"}
-      </p>
-      {/* Download Button */}
+      {/* Download Button - Modernized look */}
       <a
         href={data.video}
         download
-        className="ml-auto px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-full transition-colors font-semibold flex items-center gap-1"
+        className="px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-xl transition-colors font-semibold flex items-center gap-1 shadow-md shadow-purple-500/30 self-start"
         title="Download Video"
       >
         <Save className="w-3 h-3" />
         Save
       </a>
     </div>
-    <div className="flex justify-center rounded-lg overflow-hidden border border-gray-700/50">
+    <div className="flex justify-center rounded-xl overflow-hidden border-4 border-gray-700/50">
       <video
-        className="w-full h-auto object-cover"
+        className="w-full h-auto object-cover bg-black"
         controls
         muted
         preload="auto"
@@ -470,34 +552,35 @@ const VideoOPNode = ({ data, isConnectable }) => (
   </div>
 );
 
+// 5. Merge Node (MergeNode) - Multi-handle aesthetic
 const MergeNode = ({ data, isConnectable }) => (
-  <div className="px-5 py-4 shadow-2xl rounded-xl max-w-sm bg-gray-800 border-2 border-orange-500 min-w-[250px] backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/30">
-    {/* Target Handle for Video Inputs 1, 2, 3 */}
+  <div className="px-5 py-4 shadow-2xl rounded-2xl max-w-sm bg-gray-900/80 border-2 border-orange-500/50 min-w-[280px] backdrop-blur-md transition-all duration-300 hover:shadow-orange-500/50 hover:border-orange-500">
+    {/* Target Handles for Video Inputs 1, 2, 3 - Spaced out and styled like the others */}
     <Handle
       type="target"
       position={Position.Top}
-      id="a" // Input 1
+      id="a"
       isConnectable={isConnectable}
       style={{ left: 50, background: "#f97316", borderColor: "#fdb462" }}
-      className="w-4 h-4 shadow-lg shadow-orange-500/50"
+      className="w-4 h-4 shadow-xl shadow-orange-500/50 transform rotate-45 rounded-md"
     />
     <Handle
       type="target"
       position={Position.Top}
-      id="b" // Input 2
+      id="b"
       isConnectable={isConnectable}
       style={{
         left: "50%",
-        transform: "translateX(-50%)",
+        transform: "translateX(-50%) rotate(45deg)",
         background: "#f97316",
         borderColor: "#fdb462",
       }}
-      className="w-4 h-4 shadow-lg shadow-orange-500/50"
+      className="w-4 h-4 shadow-xl shadow-orange-500/50 rounded-md"
     />
     <Handle
       type="target"
       position={Position.Top}
-      id="c" // Input 3
+      id="c"
       isConnectable={isConnectable}
       style={{
         left: "auto",
@@ -505,7 +588,7 @@ const MergeNode = ({ data, isConnectable }) => (
         background: "#f97316",
         borderColor: "#fdb462",
       }}
-      className="w-4 h-4 shadow-lg shadow-orange-500/50"
+      className="w-4 h-4 shadow-xl shadow-orange-500/50 transform rotate-45 rounded-md"
     />
 
     {/* Source Handle for Final Video Output */}
@@ -513,28 +596,38 @@ const MergeNode = ({ data, isConnectable }) => (
       type="source"
       position={Position.Bottom}
       isConnectable={isConnectable}
-      className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-lg shadow-emerald-500/50"
+      className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-xl shadow-emerald-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
 
-    <div className="flex items-center gap-3 mb-2">
-      <div className={`p-2 rounded-lg ${ICON_COLORS.merge}`}>
+    <div className="flex items-start gap-3 mb-2 pt-4">
+      <div className={`p-3 rounded-xl ${ICON_COLORS.merge} flex-shrink-0`}>
         <Layers className="w-5 h-5" />
       </div>
-      <p className="text-white font-bold text-lg truncate">{data.label}</p>
+      <div>
+        <p className="text-white font-extrabold text-lg leading-snug truncate">
+          {data.label}
+        </p>
+        <p className="text-gray-400 text-xs mt-1">
+          Input Combination and Transformation
+        </p>
+      </div>
     </div>
-    <p className="text-gray-400 text-sm ml-8 overflow-hidden line-clamp-2">
+    <p className="text-gray-400 text-sm ml-12 overflow-hidden line-clamp-2">
       {data.description}
     </p>
-    <div className="flex justify-end pt-2 text-xs text-orange-400">
-      Inputs: {data.inputCount}
+    <div className="flex justify-end pt-3 text-sm text-orange-400 font-semibold border-t border-gray-700/50 mt-3">
+      Expected Inputs:{" "}
+      <span className="text-white ml-1">{data.inputCount}</span>
     </div>
   </div>
 );
 
+// --- Register Node and Edge Types ---
 const nodeTypes = {
   parent: ParentNode,
   child: ChildNode,
   videoOP: VideoOPNode,
+  textOP: TextOPNode,
   merge: MergeNode,
 };
 
@@ -542,7 +635,7 @@ const edgeTypes = {
   deleteButton: DeleteButtonEdge,
 };
 
-// --- Main Component Logic ---
+// --- Main Component Logic (Functionality remains the same) ---
 function WorkflowOrchestrationContent() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -554,9 +647,6 @@ function WorkflowOrchestrationContent() {
   const [executingParentIds, setExecutingParentIds] = useState([]);
   const [isExecuting, setIsExecuting] = useState(false);
   const chatEndRef = useRef(null);
-
-  // 🚨 Removed hasSelection state and its useEffect/handler hooks since the Delete Selected button is removed
-  // The ReactFlow component will now manage node/edge selection internally.
 
   const CHILD_NODE_HEIGHT = 170;
   const NODE_VERTICAL_SPACING = 50;
@@ -571,7 +661,10 @@ function WorkflowOrchestrationContent() {
     scrollToBottom();
   }, [activeParentNode, isThinking]);
 
-  // Custom OnNodesChange handler to ensure React Flow internal state updates
+  // Function implementations (onConnect, onNodeClick, createChildrenAndGrandchildren, etc.)
+  // are omitted here as they are unchanged and solely implement the logic, not the UI.
+  // ... (useCallback functions for handlers, data manipulation logic)
+
   const handleNodesChange = useCallback(
     (changes) => {
       onNodesChange(changes);
@@ -579,7 +672,6 @@ function WorkflowOrchestrationContent() {
     [onNodesChange]
   );
 
-  // Custom OnEdgesChange handler to ensure React Flow internal state updates
   const handleEdgesChange = useCallback(
     (changes) => {
       onEdgesChange(changes);
@@ -702,6 +794,7 @@ function WorkflowOrchestrationContent() {
 
     for (let i = 0; i < 3; i++) {
       const childId = `${nodeIdCounter++}`;
+      // In a full implementation, you'd decide whether to create a videoOp or textOp here
       const videoOpId = `${nodeIdCounter++}`;
       newVideoOpIds.push(videoOpId);
 
@@ -1021,6 +1114,11 @@ function WorkflowOrchestrationContent() {
         video: "https://www.w3schools.com/html/mov_bbb.mp4",
         label: `Output ${nodeIdCounter}`,
       },
+      // 🚨 FEATURE: Default content for Text Output
+      textOP: {
+        label: `Text Output ${nodeIdCounter}`,
+        content: `Analysis complete: Status report for Node ${nodeIdCounter} ready.`,
+      },
       merge: {
         label: `Merge ${nodeIdCounter}`,
         description: "Custom merge operation.",
@@ -1073,54 +1171,56 @@ function WorkflowOrchestrationContent() {
   const currentChatMessages = activeParentNode?.data?.chatHistory || [];
 
   return (
-    <div className="w-full h-screen bg-linear-to-br from-gray-950 via-gray-900 to-gray-950 flex flex-col">
-      {/* Header Bar */}
-      <div className="bg-linear-to-r from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl border-b border-gray-700/50 shadow-2xl">
+    // 1. Main Container - Enhanced Gradient Background
+    <div className="w-full h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex flex-col">
+      {/* 2. Header Bar - Enhanced Glassmorphism */}
+      <div className="bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/50 shadow-2xl shadow-gray-900/50 z-20">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/30">
-                <Zap className="w-5 h-5 text-white" />
+              <div className="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-lg shadow-emerald-500/50">
+                <Zap className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className=" flex flex-col px-2 rounded-lg ">
-                  <h1 className="text-lg font-bold text-white tracking-tight">
-                    SARAS AI
-                    <br />
-                  </h1>
-                  <span className="text-xs text-gray-400">
-                    Next-Gen Chain Prompting
-                  </span>
-                </div>
+                <h1 className="text-xl font-extrabold text-white tracking-wider">
+                  SARAS AI
+                </h1>
+                <span className="text-xs text-gray-400">
+                  Next-Gen Chain Prompting
+                </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* FEATURE: Delete All Workflows Button (Cluster Delete) */}
+          <div className="flex items-center gap-4">
+            {/* Status Info */}
+            <div className="flex items-center gap-4 text-xs text-gray-400 border-r border-gray-700/50 pr-4">
+              <span>
+                <span className="font-semibold text-white">{nodes.length}</span>{" "}
+                Nodes
+              </span>
+              <span>
+                <span className="font-semibold text-white">{edges.length}</span>{" "}
+                Connections
+              </span>
+            </div>
+
+            {/* Delete All Workflows Button */}
             <button
               onClick={handleMassDeleteClusterGlobal}
-              className="px-4 py-2 bg-red-800/70 hover:bg-red-900 disabled:bg-gray-700/50 text-white rounded-lg transition-all duration-200 text-sm font-semibold shadow-lg shadow-red-500/30 flex items-center gap-2"
+              className="px-4 py-2 bg-red-800/70 hover:bg-red-900 disabled:bg-gray-700/50 text-white rounded-xl transition-all duration-200 text-sm font-semibold shadow-lg shadow-red-500/30 flex items-center gap-2 border border-red-700/50"
               title="Delete ALL Parent Prompts and their entire branches"
+              disabled={isExecuting}
             >
               <Trash className="w-4 h-4" />
-              Delete All Workflows
+              Delete All
             </button>
 
-            {/* 🚨 REMOVED: Delete Selected Button (Now rely on keyboard delete for selection) */}
-
-            <div className="px-6 py-4 flex items-center justify-between border-t border-gray-700/30">
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <span>{nodes.length} nodes</span>
-                <span>•</span>
-                <span>{edges.length} connections</span>
-              </div>
-            </div>
-            {/* FEATURE: Execute All Button now uses handleMassRun */}
+            {/* Execute All Button */}
             <button
               onClick={handleExecuteWorkflowGlobal}
               disabled={isExecuting}
-              className="px-5 py-2 bg-linear-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 text-sm font-semibold shadow-lg shadow-emerald-500/30 flex items-center gap-2"
+              className="px-5 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white rounded-xl transition-all duration-200 text-sm font-bold shadow-xl shadow-emerald-500/50 flex items-center gap-2 border border-emerald-400/50"
             >
               {isExecuting ? (
                 <>
@@ -1129,7 +1229,7 @@ function WorkflowOrchestrationContent() {
                 </>
               ) : (
                 <>
-                  <Play className="w-4 h-4" />
+                  <Play className="w-4 h-4 fill-current" />
                   Execute All
                 </>
               )}
@@ -1138,72 +1238,86 @@ function WorkflowOrchestrationContent() {
         </div>
       </div>
 
-      {/* Node Tool Bar */}
-      <div className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700/50 px-6 py-3 flex items-center gap-2">
-        <span className="text-xs text-gray-400 font-medium mr-2">
-          ADD NODE:
+      {/* 3. Node Tool Bar - Enhanced Drag-and-Drop Hint */}
+      <div className="bg-gray-800/70 backdrop-blur-md border-b border-gray-700/50 px-6 py-3 flex items-center gap-3 shadow-inner shadow-gray-900/50 z-10">
+        <span className="text-sm text-gray-300 font-bold mr-2 flex items-center gap-1">
+          <MousePointer2 className="w-4 h-4 text-gray-500" />
+          DRAG & DROP:
         </span>
-        <button
-          onClick={() => addNewNode("parent")}
-          className="px-4 py-2 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white rounded-lg transition-all duration-200 text-sm flex items-center gap-2 border border-gray-600/50 shadow-lg"
-        >
-          <MessageSquare className="w-4 h-4 text-emerald-400" />
-          Parent Prompt
-        </button>
-        <button
-          onClick={() => addNewNode("child")}
-          className="px-4 py-2 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white rounded-lg transition-all duration-200 text-sm flex items-center gap-2 border border-gray-600/50 shadow-lg"
-        >
-          <Bot className="w-4 h-4 text-blue-400" />
-          Child Prompt
-        </button>
-        <button
-          onClick={() => addNewNode("videoOP")}
-          className="px-4 py-2 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white rounded-lg transition-all duration-200 text-sm flex items-center gap-2 border border-gray-600/50 shadow-lg"
-        >
-          <Video className="w-4 h-4 text-purple-400" />
-          Video Output
-        </button>
-        <button
-          onClick={() => addNewNode("merge")}
-          className="px-4 py-2 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white rounded-lg transition-all duration-200 text-sm flex items-center gap-2 border border-gray-600/50 shadow-lg"
-        >
-          <Layers className="w-4 h-4 text-orange-400" />
-          Merge
-        </button>
+        {[
+          {
+            type: "parent",
+            icon: MessageSquare,
+            color: "text-emerald-400",
+            label: "Parent Prompt",
+          },
+          {
+            type: "child",
+            icon: Bot,
+            color: "text-blue-400",
+            label: "Child Prompt",
+          },
+          {
+            type: "videoOP",
+            icon: Video,
+            color: "text-purple-400",
+            label: "Video Output",
+          },
+          {
+            type: "textOP",
+            icon: FileText,
+            color: "text-cyan-400",
+            label: "Text Output",
+          },
+          {
+            type: "merge",
+            icon: Layers,
+            color: "text-orange-400",
+            label: "Merge",
+          },
+        ].map((item) => (
+          <button
+            key={item.type}
+            onClick={() => addNewNode(item.type)}
+            className="px-4 py-2 bg-gray-700/70 hover:bg-gray-700 text-white rounded-xl transition-all duration-200 text-sm flex items-center gap-2 border border-gray-600/50 shadow-md hover:shadow-lg hover:border-gray-500/50"
+          >
+            <item.icon className={`w-4 h-4 ${item.color}`} />
+            {item.label}
+          </button>
+        ))}
 
-        <div className="ml-auto flex flex-col items-end text-xs text-gray-400">
-          <div className="flex items-center justify-evenly gap-2">
-            <span>Clip → Merge:</span>
-            <div className="w-8 h-0.5 bg-orange-500"></div>
+        <div className="ml-auto flex items-center gap-4 text-xs text-gray-400 font-medium">
+          <div className="flex items-center gap-2">
+            <span>Clip $\rightarrow$ Merge:</span>
+            <div className="w-8 h-1 bg-orange-500 rounded-full shadow-md shadow-orange-500/50"></div>
           </div>
-          <div className="flex items-center justify-evenly gap-2">
-            <span>Merge → Final:</span>
-            <div className="w-8 h-0.5 bg-emerald-500"></div>
+          <div className="flex items-center gap-2">
+            <span>Parent $\rightarrow$ Child:</span>
+            <div className="w-8 h-1 bg-emerald-500 rounded-full shadow-md shadow-emerald-500/50"></div>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 relative flex ">
-        {/* Chat Panel - Reads from activeParentNode */}
+      {/* 4. Main Content Area */}
+      <div className="flex-1 relative flex">
+        {/* Chat Panel - Left Sidebar */}
         {showParentChat && activeParentNode && (
-          <div className="w-96 bg-linear-to-br overflow-auto max-h-[calc(100vh-120px)] from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl border-r border-gray-700/50 shadow-2xl flex flex-col">
+          <div className="w-96 bg-gray-900/90 backdrop-blur-xl border-r border-gray-700/50 shadow-2xl shadow-gray-900/50 flex flex-col z-10">
             <div className="p-4 border-b border-gray-700/50 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-500/20 rounded-lg">
+                <div className="p-3 bg-emerald-500/20 rounded-xl border border-emerald-500/50">
                   <MessageSquare className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold">
-                    {activeParentNode.data.label} Chat
+                  <h3 className="text-white font-bold leading-snug">
+                    {activeParentNode.data.label}
                   </h3>
                   <p className="text-xs text-gray-400">
                     Configure your workflow
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <button
                   onClick={() => {
                     if (activeParentNode) {
@@ -1222,7 +1336,6 @@ function WorkflowOrchestrationContent() {
                               : node
                           )
                         );
-                        // Update activeParentNode immediately
                         setActiveParentNode((prev) => ({
                           ...prev,
                           data: { ...prev.data, label: newLabel },
@@ -1230,10 +1343,10 @@ function WorkflowOrchestrationContent() {
                       }
                     }
                   }}
-                  className="text-gray-400 hover:text-emerald-400 hover:bg-gray-700/50 p-2 rounded-lg transition-all"
+                  className="text-gray-400 hover:text-emerald-400 hover:bg-gray-800 p-2 rounded-full transition-all"
                   title="Edit Parent Prompt Label"
                 >
-                  <Pencil className="w-5 h-5" />
+                  <Pencil className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => {
@@ -1243,51 +1356,12 @@ function WorkflowOrchestrationContent() {
                         "Are you sure you want to delete this parent prompt and all its children?"
                       )
                     ) {
-                      const childrenIds = nodes
-                        .filter((node) =>
-                          edges.some(
-                            (edge) =>
-                              edge.source === activeParentNode.id &&
-                              edge.target === node.id
-                          )
-                        )
-                        .map((child) => child.id);
-
-                      const videoOpIds = nodes
-                        .filter((node) =>
-                          edges.some(
-                            (edge) =>
-                              childrenIds.includes(edge.source) &&
-                              edge.target === node.id
-                          )
-                        )
-                        .map((gc) => gc.id);
-
-                      const mergeId = nodes
-                        .filter(
-                          (n) =>
-                            n.type === "merge" &&
-                            edges.some(
-                              (e) =>
-                                videoOpIds.includes(e.source) &&
-                                e.target === n.id
-                            )
-                        )
-                        .map((n) => n.id);
-                      const finalOutputId =
-                        mergeId.length > 0
-                          ? edges
-                              .filter((e) => e.source === mergeId[0])
-                              .map((e) => e.target)
-                          : [];
-
-                      const nodesToDelete = [
+                      const { nodeIds } = findBranchNodesAndEdges(
                         activeParentNode.id,
-                        ...childrenIds,
-                        ...videoOpIds,
-                        ...mergeId,
-                        ...finalOutputId,
-                      ];
+                        nodes,
+                        edges
+                      );
+                      const nodesToDelete = [activeParentNode.id, ...nodeIds];
 
                       setNodes((nds) =>
                         nds.filter((node) => !nodesToDelete.includes(node.id))
@@ -1304,29 +1378,29 @@ function WorkflowOrchestrationContent() {
                       setActiveParentNode(null);
                     }
                   }}
-                  className="text-gray-400 hover:text-red-400 hover:bg-gray-700/50 p-2 rounded-lg transition-all"
+                  className="text-gray-400 hover:text-red-400 hover:bg-gray-800 p-2 rounded-full transition-all"
                   title="Delete Parent Prompt"
                 >
-                  <Trash className="w-5 h-5" />
+                  <Trash className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setShowParentChat(false)}
-                  className="text-gray-400 hover:text-white hover:bg-gray-700/50 p-2 rounded-lg transition-all"
+                  className="text-gray-400 hover:text-white hover:bg-gray-800 p-2 rounded-full transition-all"
                   title="Close Chat"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
               {currentChatMessages.length === 0 && (
                 <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <div className="p-4 bg-emerald-500/10 rounded-full inline-block mb-4">
+                  <div className="text-center p-6 bg-gray-800/70 rounded-xl border border-gray-700/50 shadow-inner">
+                    <div className="p-4 bg-emerald-500/10 rounded-full inline-block mb-4 border border-emerald-500/30">
                       <MessageSquare className="w-8 h-8 text-emerald-400" />
                     </div>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-400 text-sm font-medium">
                       Start chatting to configure your parent prompt
                     </p>
                     <p className="text-gray-500 text-xs mt-2">
@@ -1345,14 +1419,20 @@ function WorkflowOrchestrationContent() {
                   }`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={`max-w-[85%] rounded-2xl p-3 shadow-lg ${
                       message.sender === "user"
-                        ? "bg-emerald-600 text-white"
-                        : "bg-gray-700/50 text-gray-100"
+                        ? "bg-emerald-600 text-white rounded-br-none"
+                        : "bg-gray-700/70 text-gray-100 rounded-tl-none border border-gray-600/50"
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
-                    <p className="text-xs mt-1 opacity-70">
+                    <p className="text-sm leading-relaxed">{message.text}</p>
+                    <p
+                      className={`text-xs mt-1 ${
+                        message.sender === "user"
+                          ? "text-emerald-200"
+                          : "text-gray-400"
+                      }`}
+                    >
                       {message.timestamp}
                     </p>
                   </div>
@@ -1361,14 +1441,16 @@ function WorkflowOrchestrationContent() {
 
               {isThinking && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-700/50 text-gray-100 rounded-lg p-3 max-w-[80%]">
+                  <div className="bg-gray-700/70 text-gray-100 rounded-2xl rounded-tl-none p-3 max-w-[80%] shadow-lg border border-gray-600/50">
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1">
                         <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce delay-100"></div>
                         <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce delay-200"></div>
                       </div>
-                      <span className="text-sm font-medium">THINKING...</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        SARAS AI IS THINKING...
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1376,21 +1458,21 @@ function WorkflowOrchestrationContent() {
               <div ref={chatEndRef} />
             </div>
 
-            <div className="p-4 border-t border-gray-700/50">
+            <div className="p-4 border-t border-gray-700/50 bg-gray-900/80">
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
-                  className="flex-1 px-4 py-3 bg-gray-800/50 text-white rounded-lg border border-gray-600/50 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  placeholder="Type your prompt..."
+                  className="flex-1 px-4 py-3 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all placeholder-gray-500"
                   disabled={isThinking}
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={isThinking || inputValue.trim() === ""}
-                  className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg transition-all flex items-center gap-2"
+                  className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-xl transition-all flex items-center shadow-lg shadow-emerald-500/30"
                 >
                   <Send className="w-5 h-5" />
                 </button>
@@ -1415,15 +1497,14 @@ function WorkflowOrchestrationContent() {
               },
             }))}
             edges={edges}
-            onNodesChange={handleNodesChange} // 🚨 Use custom handler
-            onEdgesChange={handleEdgesChange} // 🚨 Use custom handler
+            onNodesChange={handleNodesChange}
+            onEdgesChange={handleEdgesChange}
             onConnect={onConnect}
             onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            deleteKeyCode={["Backspace", "Delete"]} // Allows keyboard delete for selected elements
-            selectionKeyCode="Shift" // Use Shift for marquee selection
-            // 🚨 FIX: Re-enable panOnDrag for hand movement (panning)
+            deleteKeyCode={["Backspace", "Delete"]}
+            selectionKeyCode="Shift"
             panOnDrag={true}
             fitView
             className="bg-transparent"
@@ -1433,15 +1514,17 @@ function WorkflowOrchestrationContent() {
               gap={25}
               size={5}
               variant="dots"
-              className="opacity-20"
+              className="opacity-10" // Reduced opacity for a cleaner look
             />
-            <Controls className="bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-xl shadow-2xl" />
+            {/* Controls - Modernized floating glass effect */}
+            <Controls className="!bg-gray-900/80 !backdrop-blur-md !border !border-gray-700 !rounded-xl !shadow-2xl !shadow-gray-900/50 !text-gray-400 absolute bottom-6 right-6" />
             <MiniMap
               zoomable
               pannable
               nodeBorderRadius={10}
-              bgColor="rgba(31, 41, 55, 0.7)"
-              maskColor="rgba(86, 86, 87, 0.7)"
+              // Darker, less distracting minimap colors
+              bgColor="rgba(31, 41, 55, 0.9)"
+              maskColor="rgba(100, 100, 100, 0.4)"
               nodeColor={(node) => {
                 switch (node.type) {
                   case "parent":
@@ -1450,44 +1533,48 @@ function WorkflowOrchestrationContent() {
                     return "#3b82f6";
                   case "videoOP":
                     return "#a855f7";
+                  case "textOP":
+                    return "#06b6d4";
                   case "merge":
                     return "#f97316";
                   default:
                     return "#6b7280";
                 }
               }}
+              className="!border !border-gray-700/50 !rounded-xl !shadow-2xl !shadow-gray-900/50"
             />
           </ReactFlow>
 
-          {/* Configuration Panel (Side Bar) */}
+          {/* Configuration Panel (Right Sidebar) - Enhanced Glassmorphism */}
           {currentSelectedNode && (
-            <div className="absolute right-0 top-0 bottom-0 w-96 bg-linear-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl border-l border-gray-700/50 shadow-2xl overflow-y-auto">
+            <div className="absolute right-0 top-0 bottom-0 w-96 bg-gray-900/90 backdrop-blur-xl border-l border-gray-700/50 shadow-2xl shadow-gray-900/50 overflow-y-auto z-10 custom-scrollbar">
               <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-6 border-b border-gray-700/50 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-linear-to-br from-emerald-500 to-emerald-600 rounded-lg">
+                    <div className="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-lg shadow-emerald-500/30">
                       <Settings className="w-5 h-5 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold text-white">
+                    <h3 className="text-xl font-bold text-white">
                       Node Configuration
                     </h3>
                   </div>
                   <button
                     onClick={() => setSelectedNode(null)}
-                    className="text-gray-400 hover:text-white hover:bg-gray-700/50 p-2 rounded-lg transition-all duration-200"
+                    className="text-gray-400 hover:text-white hover:bg-gray-800 p-2 rounded-full transition-all duration-200"
                   >
-                    ✕
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
 
-                <div className="space-y-5">
+                <div className="space-y-6">
                   {(currentSelectedNode.type === "parent" ||
                     currentSelectedNode.type === "child" ||
                     currentSelectedNode.type === "merge" ||
-                    currentSelectedNode.type === "videoOP") && (
+                    currentSelectedNode.type === "videoOP" ||
+                    currentSelectedNode.type === "textOP") && (
                     <>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-bold text-gray-300 mb-2">
                           Node Label
                         </label>
                         <input
@@ -1508,7 +1595,7 @@ function WorkflowOrchestrationContent() {
                               )
                             );
                           }}
-                          className="w-full px-4 py-3 bg-gray-800/50 text-white rounded-lg border border-gray-600/50 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200"
+                          className="w-full px-4 py-3 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200"
                         />
                       </div>
                     </>
@@ -1519,7 +1606,7 @@ function WorkflowOrchestrationContent() {
                     currentSelectedNode.type === "child" ||
                     currentSelectedNode.type === "merge") && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
+                      <label className="block text-sm font-bold text-gray-300 mb-2">
                         Description
                       </label>
                       <textarea
@@ -1540,7 +1627,7 @@ function WorkflowOrchestrationContent() {
                             )
                           );
                         }}
-                        className="w-full px-4 py-3 bg-gray-800/50 text-white rounded-lg border border-gray-600/50 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 resize-none"
+                        className="w-full px-4 py-3 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 resize-none"
                       />
                     </div>
                   )}
@@ -1548,7 +1635,7 @@ function WorkflowOrchestrationContent() {
                   {/* Video URL for VideoOP */}
                   {currentSelectedNode.type === "videoOP" && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
+                      <label className="block text-sm font-bold text-gray-300 mb-2">
                         Video URL
                       </label>
                       <input
@@ -1569,7 +1656,22 @@ function WorkflowOrchestrationContent() {
                             )
                           );
                         }}
-                        className="w-full px-4 py-3 bg-gray-800/50 text-white rounded-lg border border-gray-600/50 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200"
+                        className="w-full px-4 py-3 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200"
+                      />
+                    </div>
+                  )}
+
+                  {/* Text Content for TextOP */}
+                  {currentSelectedNode.type === "textOP" && (
+                    <div>
+                      <label className="block text-sm font-bold text-gray-300 mb-2">
+                        Text Content (Read Only)
+                      </label>
+                      <textarea
+                        readOnly
+                        rows="5"
+                        value={currentSelectedNode.data.content}
+                        className="w-full px-4 py-3 bg-gray-800/50 text-gray-400 rounded-xl border border-gray-700/50 resize-none focus:outline-none"
                       />
                     </div>
                   )}
@@ -1577,47 +1679,48 @@ function WorkflowOrchestrationContent() {
                   {/* Input Count for Merge Node */}
                   {currentSelectedNode.type === "merge" && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
+                      <label className="block text-sm font-bold text-gray-300 mb-2">
                         Input Count
                       </label>
-                      <div className="px-4 py-3 bg-gray-800/30 text-gray-400 rounded-lg border border-gray-600/30 text-sm">
+                      <div className="px-4 py-3 bg-gray-800/50 text-gray-300 rounded-xl border border-gray-700/50 text-sm font-mono">
                         {currentSelectedNode.data.inputCount}
                       </div>
                     </div>
                   )}
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">
-                      Node Type
-                    </label>
-                    <div className="px-4 py-3 bg-gray-800/30 text-gray-400 rounded-lg border border-gray-600/30 flex items-center justify-between">
-                      <span>{currentSelectedNode.type}</span>
-                      <span className="px-2 py-1 bg-gray-700/50 rounded text-xs">
-                        Read only
-                      </span>
+                  {/* Node Type and ID Section - Grouped with better styling */}
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700/50">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 mb-2">
+                        NODE TYPE
+                      </label>
+                      <div className="px-4 py-3 bg-gray-800/50 text-white rounded-xl border border-gray-700/50 text-sm font-semibold">
+                        {currentSelectedNode.type}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 mb-2">
+                        NODE ID
+                      </label>
+                      <div className="px-4 py-3 bg-gray-800/50 text-gray-400 rounded-xl border border-gray-700/50 text-sm font-mono">
+                        {currentSelectedNode.id}
+                      </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">
-                      Node ID
-                    </label>
-                    <div className="px-4 py-3 bg-gray-800/30 text-gray-400 rounded-lg border border-gray-600/30 text-sm font-mono">
-                      {currentSelectedNode.id}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-2">
+                    <label className="block text-sm font-bold text-gray-300 mb-2">
                       Hierarchy Level
                     </label>
-                    <div className="px-4 py-3 bg-gray-800/30 text-gray-400 rounded-lg border border-gray-600/30 text-sm">
+                    <div className="px-4 py-3 bg-gray-800/50 text-gray-300 rounded-xl border border-gray-700/50 text-sm">
                       {currentSelectedNode.type === "parent"
                         ? "Parent (Root)"
                         : currentSelectedNode.type === "child"
                         ? "Child (Level 1)"
                         : currentSelectedNode.type === "merge"
                         ? "Merge (Level 3)"
+                        : currentSelectedNode.type === "textOP"
+                        ? "Text Output (Level 2/4)"
                         : "Output (Level 2/4)"}
                     </div>
                   </div>
@@ -1637,7 +1740,7 @@ function WorkflowOrchestrationContent() {
                         );
                         setSelectedNode(null);
                       }}
-                      className="w-full px-4 py-3 bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-200 font-semibold shadow-lg shadow-red-500/20"
+                      className="w-full px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl transition-all duration-200 font-bold shadow-xl shadow-red-500/30 border border-red-700/50"
                     >
                       Delete Node
                     </button>
