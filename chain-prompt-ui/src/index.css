@@ -1,0 +1,29 @@
+@import "tailwindcss";
+:root {
+  --theme-color: #00ae73;
+  --theme-color-scrollbar-bg: #bcffb6;
+  --theme-color-light: #b2f5ea;
+  --test: rgba(86, 86, 87, 0.7);
+
+  scroll-behavior: smooth;
+}
+::-webkit-scrollbar {
+  /* Set a width to make the scrollbar visible */
+  width: 2px;
+}
+
+::-webkit-scrollbar-track {
+  /* Give the track a background color */
+  background-color: var(--theme-color-scrollbar-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  /* Style the thumb */
+  background-color: var(--theme-color);
+  border-radius: 5px;
+}
+
+::selection {
+  background-color: var(--theme-color-light);
+  color: #c300ff;
+}
