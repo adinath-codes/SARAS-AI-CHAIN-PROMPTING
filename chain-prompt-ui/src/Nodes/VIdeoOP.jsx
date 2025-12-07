@@ -44,6 +44,10 @@ const VideoOPNode = ({ data, isConnectable }) => (
       type="target"
       position={Position.Top}
       isConnectable={isConnectable}
+      style={{
+        height: "1em",
+        width: "1em",
+      }}
       className="w-4 h-4 bg-purple-500 border-2 border-purple-300 shadow-xl shadow-purple-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
     <Handle
@@ -51,6 +55,10 @@ const VideoOPNode = ({ data, isConnectable }) => (
       position={Position.Bottom}
       id="s"
       isConnectable={isConnectable}
+      style={{
+        height: "1em",
+        width: "1em",
+      }}
       className="w-4 h-4 bg-orange-500 border-2 border-orange-300 shadow-xl shadow-orange-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
     <div className="flex items-start justify-between gap-3 mb-4">

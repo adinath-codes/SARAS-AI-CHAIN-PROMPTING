@@ -41,13 +41,21 @@ const CodeBlockNode = ({ data, isConnectable }) => {
         type="target"
         position={Position.Top}
         isConnectable={isConnectable}
-        className="w-4 h-4 bg-teal-500 border-2 border-teal-300 shadow-xl shadow-teal-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
+        style={{
+          width: "1em",
+          height: "1em",
+        }}
+        className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-xl shadow-emerald-500/50 transform "
       />
       <Handle
         type="source"
         position={Position.Bottom}
         isConnectable={isConnectable}
-        className="w-4 h-4 bg-teal-500 border-2 border-teal-300 shadow-xl shadow-teal-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
+        style={{
+          width: "1em",
+          height: "1em",
+        }}
+        className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-xl shadow-emerald-500/50 transform "
       />
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-start gap-3">

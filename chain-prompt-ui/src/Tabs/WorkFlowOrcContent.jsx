@@ -47,7 +47,7 @@ import {
   nodeTypes,
   edgeTypes,
   ICON_COLORS,
-} from "./utils/constants";
+} from "../utils/constants";
 
 let nodeIdCounter = 12;
 
@@ -1099,7 +1099,7 @@ const WorkflowOrchestrationInner = () => {
                   </h1>
                   <span className="text-xs text-gray-400 flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
-                    Next-Gen Chain Prompting
+                    Next-Gen Chain Prompting with OUMI
                   </span>
                 </div>
               </div>

@@ -33,7 +33,9 @@ import {
   Layers,
   FileText,
   MousePointer2,
-  Code, // 🚨 IMPORTED: Code icon for CodeBlockNode
+  Code,
+  Plus,
+  Cross, // 🚨 IMPORTED: Code icon for CodeBlockNode
 } from "lucide-react";
 import { ICON_COLORS } from "../utils/constants";
 
@@ -63,8 +65,13 @@ const ParentNode = ({ data, id, data: { isRunning, onExecute } }) => (
     <Handle
       type="source"
       position={Position.Bottom}
-      className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-xl shadow-emerald-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
+      style={{
+        width: "1em",
+        height: "1em",
+      }}
+      className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-xl shadow-emerald-500/50 transform "
     />
+
     <div className="flex items-start justify-between mb-2 mt-5">
       <div className="flex items-start gap-3">
         <div className={`p-3 rounded-xl ${ICON_COLORS.parent} flex-shrink-0`}>

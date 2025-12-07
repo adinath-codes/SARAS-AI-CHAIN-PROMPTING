@@ -18,7 +18,13 @@ const SummaryNode = ({ data, isConnectable }) => (
       position={Position.Top}
       id="a"
       isConnectable={isConnectable}
-      style={{ left: 50, background: "#ec4899", borderColor: "#f9a8d4" }}
+      style={{
+        left: 50,
+        background: "#ec4899",
+        borderColor: "#f9a8d4",
+        height: "1em",
+        width: "1em",
+      }}
       className="w-4 h-4 shadow-xl shadow-pink-500/50 transform rotate-45 rounded-md"
     />
 
@@ -33,6 +39,8 @@ const SummaryNode = ({ data, isConnectable }) => (
         transform: "translateX(-50%) rotate(45deg)",
         background: "#ec4899",
         borderColor: "#f9a8d4",
+        height: "1em",
+        width: "1em",
       }}
       className="w-4 h-4 shadow-xl shadow-pink-500/50 rounded-md"
     />
@@ -48,6 +56,8 @@ const SummaryNode = ({ data, isConnectable }) => (
         right: 50,
         background: "#ec4899",
         borderColor: "#f9a8d4",
+        height: "1em",
+        width: "1em",
       }}
       className="w-4 h-4 shadow-xl shadow-pink-500/50 transform rotate-45 rounded-md"
     />
@@ -92,6 +102,10 @@ const SummaryNode = ({ data, isConnectable }) => (
       type="source"
       position={Position.Bottom}
       isConnectable={isConnectable}
+      style={{
+        height: "1em",
+        width: "1em",
+      }}
       className="w-4 h-4 bg-pink-500 border-2 border-pink-300 shadow-xl shadow-pink-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
   </div>

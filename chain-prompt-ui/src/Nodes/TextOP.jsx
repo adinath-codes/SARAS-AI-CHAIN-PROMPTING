@@ -44,12 +44,20 @@ const TextOPNode = ({ data, isConnectable }) => (
       type="target"
       position={Position.Top}
       isConnectable={isConnectable}
+      style={{
+        height: "1em",
+        width: "1em",
+      }}
       className="w-4 h-4 bg-cyan-500 border-2 border-cyan-300 shadow-xl shadow-cyan-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
     <Handle
       type="source"
       position={Position.Bottom}
       isConnectable={isConnectable}
+      style={{
+        height: "1em",
+        width: "1em",
+      }}
       className="w-4 h-4 bg-cyan-500 border-2 border-cyan-300 shadow-xl shadow-cyan-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
     <div className="flex items-start gap-4 mb-3">

@@ -45,7 +45,13 @@ const MergeNode = ({ data, isConnectable }) => (
       position={Position.Top}
       id="a"
       isConnectable={isConnectable}
-      style={{ left: 50, background: "#f97316", borderColor: "#fdb462" }}
+      style={{
+        left: 50,
+        background: "#f97316",
+        borderColor: "#fdb462",
+        height: "1em",
+        width: "1em",
+      }}
       className="w-4 h-4 shadow-xl shadow-orange-500/50 transform rotate-45 rounded-md"
     />
     <Handle
@@ -58,6 +64,8 @@ const MergeNode = ({ data, isConnectable }) => (
         transform: "translateX(-50%) rotate(45deg)",
         background: "#f97316",
         borderColor: "#fdb462",
+        height: "1em",
+        width: "1em",
       }}
       className="w-4 h-4 shadow-xl shadow-orange-500/50 rounded-md"
     />
@@ -71,6 +79,8 @@ const MergeNode = ({ data, isConnectable }) => (
         right: 50,
         background: "#f97316",
         borderColor: "#fdb462",
+        height: "1em",
+        width: "1em",
       }}
       className="w-4 h-4 shadow-xl shadow-orange-500/50 transform rotate-45 rounded-md"
     />
@@ -79,6 +89,10 @@ const MergeNode = ({ data, isConnectable }) => (
     <Handle
       type="source"
       position={Position.Bottom}
+      style={{
+        height: "1em",
+        width: "1em",
+      }}
       isConnectable={isConnectable}
       className="w-4 h-4 bg-emerald-500 border-2 border-emerald-300 shadow-xl shadow-emerald-500/50 transform rotate-45 rounded-md !left-1/2 !-translate-x-1/2"
     />
